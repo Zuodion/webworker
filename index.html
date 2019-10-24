@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Document</title>
+    </head>
+    <body>
+        <label for="number">Enter your number</label>
+        <input type="text" id="number" class="input-number">
+        <button onclick="executeWebWorker()">WebWorkerDo</button>
+        <button onclick="executePageLogic()">Page do</button>
+        <button onclick="doAll()">Do all</button>
+        <p class="result">Result: </p>
+    </body>
+</html>
+
+<script>
+let workerStart;
+let workerEnd;
+let pageStart;
+let pageEnd;
+const myWorker = new Worker("./WebWorker.js");
+myWorker.onmessage = (e) => {
+    document.querySelector('.result').innerHTML += `WebWorker done - ${e.data}`;
+    workerEnd = new Date().getTime();
+    console.log(`Worker time: ${workerEnd - workerStart}`)
+    workerStart = undefined;
+    workerEnd = undefined;
+}
+
+function executeWebWorker() {
+    let number = document.getElementById('number').value;
+    workerStart = new Date().getTime();
+    myWorker.postMessage(number);
+}
+
+function executePageLogic() {
+    let number = document.getElementById('number').value;
+    pageStart = new Date().getTime();
+    let newNumber = factorialize(number)
+    while (newNumber > 1) newNumber--;
+    pageEnd = new Date().getTime();
+    console.log(`Page time: ${pageEnd - pageStart}`)
+    pageStart = undefined;
+    pageEnd = undefined;
+    document.querySelector('.result').innerHTML += `Page done - ${newNumber}`;
+}
+
+function factorialize(num) {
+    if (num < 0) 
+          return -1;
+    else if (num == 0) 
+        return 1;
+    else {
+        return (num * factorialize(num - 1));
+    }
+  }
+
+ function doAll() {
+    executeWebWorker()
+    executePageLogic()
+  }
+</script>
